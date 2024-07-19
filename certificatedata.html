@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birth Certificate</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Include jsPDF and html2canvas libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.3.2/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .certificate-container {
+            width: 210mm;
+            border: 2px solid black;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: white;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header img {
+            height: 100px;
+            margin-bottom: 10px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header h3 {
+            margin: 5px 0;
+            font-size: 18px;
+        }
+
+        .header p {
+            font-size: 12px;
+        }
+
+        .certify {
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: justify;
+        }
+
+        .dotted-line {
+            border-bottom: 2px dotted #000;
+            display: inline-block;
+            margin-left: 5px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        .dotted-line.long {
+            width: calc(60% - 20px);
+        }
+
+        .dotted-line.short {
+            width: calc(20% - 10px);
+        }
+
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            width: 100%;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-row label {
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 5px;
+        }
+
+        .form-row .dotted-line {
+            width: 100%;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+
+        @media (min-width: 600px) {
+            .header {
+                flex-direction: row;
+                justify-content: space-between;
+                text-align: left;
+            }
+
+            .header img {
+                margin-bottom: 0;
+            }
+
+            .header-center {
+                text-align: center;
+                flex: 1;
+                padding: 0 20px;
+            }
+
+            .form-row {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .form-row .dotted-line {
+                width: 50%;
+            }
+        }
+    </style>
+
+    <div class="certificate-container" id="certificateContainer">
+        <div class="header">
+            <div class="header-left">
+                <img src="/img/logo1.png" alt="logo1">
+            </div>
+            <div class="header-center">
+                <h2>जन्म प्रमाण-पत्र</h2>
+                <h3>BIRTH CERTIFICATE</h3>
+                <p>(Issued under Section 12/17 of the Registration of Births and Deaths Act, 1969 and Rule 8/13 of the Rajasthan Registration of Births and Deaths Rules, 2000)</p>
+            </div>
+            <div class="header-right">
+                <img src="/img/logo2.png" alt="Logo">
+            </div>
+        </div>
+        <p class="certify">This is to certify that the following information has been taken from the original record of birth which is the register for (local area / local body) <span class="dotted-line long"></span> of tahsil / block <span class="dotted-line short"></span> of District <span class="dotted-line long"></span> of state / Union territory <span class="dotted-line long"></span>.</p>
+        <form id="certificateForm">
+            <div class="form-row">
+                <label for="name">नाम/Name:</label>
+                <span class="dotted-line" id="certName"></span>
+                <label for="sex">&nbsp;&nbsp;&nbsp;लिंग/Sex:</label>
+                <span class="dotted-line long" id="certSex"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="date-of-birth">जन्म तिथि/Date of Birth:</label>
+                <span class="dotted-line long" id="certDob"></span>
+                <label for="place-of-birth">जन्म स्थान/Place of Birth:</label>
+                <span class="dotted-line long" id="certPlaceOfBirth"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="mother-aadhar">Mother's Aadhaar No.:</label>
+                <span class="dotted-line long" id="certMotherAadhar"></span>
+                <label for="father-aadhar">Father's Aadhaar No.:</label>
+                <span class="dotted-line long" id="certFatherAadhar"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="address-at-birth">Address of parents at the time of birth of the child:</label>
+                <span class="dotted-line long" id="certAddressAtBirth"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="permanent-address">Permanent address of parents:</label>
+                <span class="dotted-line long" id="certPermanentAddress"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="registration-no">पंजीकरण संख्या/Registration No.:</label>
+                <span class="dotted-line short" id="certRegistrationNo"></span>
+                <label for="date-of-registration">पंजीकरण तिथि/Date of Registration:</label>
+                <span class="dotted-line long" id="certRegistrationDate"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="remarks">टिप्पणियाँ/Remarks (if any):</label>
+                <span class="dotted-line long" id="certRemarks"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="date-of-issue">जारी करने की तिथि/Date of Issue:</label>
+                <span class="dotted-line long" id="certDateOfIssue"></span>
+            </div>
+
+            <div class="form-row">
+                <label for="signature">हस्ताक्षर/Signature of the issuing authority:</label>
+            </div>
+
+            <div class="form-row">
+                <label for="authority-address">प्राधिकारी का पता/Address of the issuing authority:</label>
+            </div>
+        </form>
+
+
+        <div class="footer">
+            <p>मुद्र / Seal</p>
+        </div>
+
+        
+        <div class="button-container">
+            <button onclick="downloadCertificate()">Download PDF</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const data = JSON.parse(sessionStorage.getItem('certificateData'));
+            console.log("Loaded data from sessionStorage:", data);
+
+            if (data) {
+                document.getElementById('certName').textContent = data.Name_of_Child;
+                document.getElementById('certSex').textContent = data.Sex;
+                document.getElementById('certDob').textContent = data.Date_of_Birth;
+                document.getElementById('certPlaceOfBirth').textContent = data.Place_of_Birth;
+                document.getElementById('certMotherAadhar').textContent = data.Mothers_Aadhaar_No;
+                document.getElementById('certFatherAadhar').textContent = data.Fathers_Aadhaar_No;
+                document.getElementById('certAddressAtBirth').textContent = data.Address_of_Parents_at_the_Time_of_Birth_of_the_Child;
+                document.getElementById('certPermanentAddress').textContent = data.Permanent_Address_of_Parents;
+                document.getElementById('certRegistrationNo').textContent = data.Registration_Number;
+                document.getElementById('certRegistrationDate').textContent = data.Date_of_Registration;
+                document.getElementById('certRemarks').textContent = data.Remarks;
+                document.getElementById('certDateOfIssue').textContent = new Date().toLocaleDateString('en-IN');
+            }
+        });
+    
+        async function downloadCertificate() {
+            const certificateContainer = document.getElementById('certificateContainer');
+            console.log("Starting the PDF generation process");
+
+            try {
+                const canvas = await html2canvas(certificateContainer, {
+                    scale: 2, // Increase the scale to improve quality
+                    useCORS: true // Enable this if your images are loaded from external domains
+                });
+                console.log("Canvas created successfully");
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Calculate the dimensions
+                const imgWidth = 210; 
+                const pageHeight = 200;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+    
+                let position = 0;
+    
+                // Add the image to the PDF
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+    
+                // Handle content spanning multiple pages
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+    
+                pdf.save('certificate.pdf');
+                console.log("PDF saved successfully");
+            } catch (error) {
+                console.error("An error occurred while generating the PDF:", error);
+            }
+        }
+    </script>
+    
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+my old:
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birth Certificate</title>
+    <link rel="stylesheet" href="kb.css">
+    <!-- Include jsPDF library -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <style>
+        /* kb.css */
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.5;
+            margin-left: 300px;
+            margin-right: 300px;
+            padding: 100px;
+            padding-left: 50px;
+            background-color: white;
+        }
+
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            border: 3px solid #000000;
+            padding: 20px;
+            background-color: white;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .form-number p {
+            align-items: center;
+        }
+
+        .logo-left {
+            text-align: left;
+        }
+
+        .logo-right {
+            text-align: right;
+        }
+
+        .logo img {
+            height: 100px;
+        }
+
+        .form-number {
+            text-align: center;
+        }
+
+        .certificateNo {
+            text-align: right;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1.5em;
+        }
+
+        p {
+            text-align: justify;
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
+        .form-section {
+            margin: 20px 0;
+        }
+
+        label {
+            font-weight: bold;
+            display: inline-block;
+            width: 300px;
+            padding-left: 150px;
+        }
+
+        span {
+            display: inline-block;
+            width: calc(100% - 310px);
+            padding: 5px;
+            font-size: 1em;
+            padding-left: 150px;
+        }
+
+        footer {
+            margin-top: 20px;
+        }
+
+        footer p {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .button-container {
+            text-align: center;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+    <div class="container">
+        <header>
+            <div class="logo logo-left">
+                <img src="/img/logo1.png" alt="Logo">
+            </div>
+            <div class="form-number">
+                <p>प्रमाणपत्र क्रमांक:</p>
+                <p>Certificate No: <span id="certificateNo"></span></p>
+            </div>
+            <div class="logo logo-right">
+                <img src="/img/logo2.png" alt="Logo">
+            </div>
+        </header>
+        <h1>जन्म प्रमाणपत्र</h1>
+        <h1>BIRTH CERTIFICATE</h1>
+
+        <div class="form-section">
+            <label>बालकाचे नाव / Name of Child:</label> <span id="nameOfChild">...........................</span><br>
+            <label>जन्म तारीख / Date of Birth:</label> <span id="dob">...........................</span><br>
+            <label>जन्म स्थान / Place of Birth:</label> <span id="placeOfBirth">...........................</span><br>
+            <label>आईचा आधार क्रमांक / Mother's Aadhaar No:</label> <span id="motherAadhar">...........................</span><br>
+            <label>वडिलांचा आधार क्रमांक / Father's Aadhaar No:</label> <span id="fatherAadhar">...........................</span><br>
+            <label>कायमचा पत्ता / Permanent Address:</label> <span id="address">...........................</span><br>
+            <label>नोंदणी क्रमांक / Registration No.:</label> <span id="registrationNo">...........................</span><br>
+            <label>प्रमाणपत्र दिल्याचा दिनांक / Date of Issue:</label> <span id="dateOfIssue">...........................</span><br>
+        </div>
+
+        <div class="button-container">
+            <button onclick="shareCertificate()">Share Certificate via WhatsApp</button>
+        </div>
+
+        <footer>
+            <p>मुद्र / Seal</p>
+        </footer>
+    </div>
+
+    <script>
+        const data = JSON.parse(sessionStorage.getItem('certificateData'));
+
+        if (data) {
+            document.getElementById('certificateNo').textContent = data.Certificate_No;
+            document.getElementById('nameOfChild').textContent = data.Name_of_Child;
+            document.getElementById('dob').textContent = data.Date_of_Birth;
+            document.getElementById('placeOfBirth').textContent = data.Place_of_Birth;
+            document.getElementById('motherAadhar').textContent = data.Mothers_Aadhaar_No;
+            document.getElementById('fatherAadhar').textContent = data.Fathers_Aadhaar_No;
+            document.getElementById('address').textContent = data.Permanent_Address;
+            document.getElementById('registrationNo').textContent = data.Registration_Number;
+            document.getElementById('dateOfIssue').textContent = data.Date_of_Issue;
+        } else {
+            document.body.innerHTML = '<p>No certificate data found.</p>';
+        }
+
+        function shareCertificate() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const certificateText = `
+                Birth Certificate\n
+                Government of India\n
+                Name of the local body issuing Certificate: ${data.Name_of_the_local_body_issuing_Certificate}\n
+                Certificate No.: ${data.Certificate_No}\n
+                Name of Child: ${data.Name_of_Child}\n
+                Date of Birth: ${data.Date_of_Birth}\n
+                Place of Birth: ${data.Place_of_Birth}\n
+                Mother's Aadhaar No.: ${data.Mothers_Aadhaar_No}\n
+                Father's Aadhaar No.: ${data.Fathers_Aadhaar_No}\n
+                Permanent Address: ${data.Permanent_Address}\n
+                Registration Number: ${data.Registration_Number}\n
+                Date of Issue: ${data.Date_of_Issue}
+            `;
+
+            doc.text(certificateText, 10, 10);
+            const pdfOutput = doc.output('datauristring');
+
+            const whatsappURL = `https://api.whatsapp.com/send?text=${encodeURIComponent(certificateText)}`;
+            window.open(whatsappURL, '_blank');
+        }
+    </script>
+</body>
+
+</html> --> -->
